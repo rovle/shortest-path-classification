@@ -2,7 +2,7 @@ from languages_dict import LANGUAGES
 import numpy as np
 import os
 
-path = 'examples/datasets/unformatted_lang_texts/'
+path = os.path.join('example', 'dataset', 'unformatted_lang_texts')
 LEN_OF_SAMPLES = 10
 
 
@@ -26,7 +26,7 @@ for language in LANGUAGES:
     samples = [text[10*j:(10*j+LEN_OF_SAMPLES)] for j in range(0, num_of_samples)]
     samples = [' '.join(sample) for sample in samples]
     samples = '\n'.join(samples)
-    save_to = os.path.join('examples', 'datasets', 'samples',
+    save_to = os.path.join('example', 'dataset', 'samples',
                             f'{language}_samples_len_{LEN_OF_SAMPLES}.txt')
     
     with open(save_to, 'w') as text_file:
