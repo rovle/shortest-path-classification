@@ -6,8 +6,9 @@ import os
 path = os.path.join('example', 'dataset', 'unformatted_lang_texts')
 LEN_OF_SAMPLES = 10
 
-def sample_dataset(n, length, language, random_state=42):
-    random.seed(random_state)
+def sample_dataset(n, length, language, random_state=None):
+    if random_state is not None:
+        random.seed(random_state)
     path_to_text = os.path.join(path, language + '_text.txt')
 
     with open(path_to_text, 'r') as file:
