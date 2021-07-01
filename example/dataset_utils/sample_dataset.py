@@ -28,7 +28,7 @@ def sample_dataset(n, length, language, random_state=None):
 
     num_of_samples = len(text) // length
     if num_of_samples < n:
-        raise ValueError("Number possible samples is smaller than desired.")
+        raise ValueError(f"Number of samples desired is larger than the number of samples possible ({num_of_samples}).")
     
     samples = [text[length*j:(length*(j+1))] for j in range(0, num_of_samples)]
     samples = random.sample(samples, n)
