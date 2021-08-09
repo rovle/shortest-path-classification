@@ -3,13 +3,13 @@ from networkx.algorithms.shortest_paths.weighted import single_source_dijkstra
 from statistics import median
 from itertools import combinations, product
 from collections import namedtuple
+import copy
 
 
 
 class ShortestPathModel():
     def __init__(self, sim_function, ):
         self.sim_function = sim_function
-
 
     def fit(self, X):        
         X_enumerated = list(enumerate(X))
@@ -33,11 +33,36 @@ class ShortestPathModel():
     def fit_predict(self, X):
         self.fit(X)
         n_samples = len(X)
-        predictions = [1 if self.distances(str(x)) > self.decision_boundary
-                    else 0 for x in range(n_samples - 1)]
-            
+        self.predictions_on_train_set = \
+                    [            
+                    1 if self.distances(str(x)) > self.decision_boundary
+                    else 0 for x in range(n_samples - 1)
+                    ]
+        
+        return self
 
-        pass
+    def predict(self, X, keep_new_nodes = False):
+        if not self.distances:
+            raise ReferenceError("The model has not been fitted yet.")
+        graph_with_added_vals = copy.deepcopy(self.graph)
+        num_X = len(X)
+        for new_node_num, old_node in product(range(num_X), self.graph.nodes):
+            similarity = self.sim_function(X[new_node_num], old_node)
+            if similarity is float('inf'):
+                continue
+            self.graph.add_edge(f"new_node_ {new_node_num}",
+                                            old_node,
+                                            self.sim_function(X[new_node_num],
+                                                                old_node)
+                                            )
+        distances_new = single_source_dijkstra(self.graph,
+                                                '0')[0][len(self.graph.nodes):]
 
-    def predict(self):
-        pass
+        predictions = \
+                    [            
+                    1 if distances_new[x] > self.decision_boundary
+                    else 0 for x in range(num_X)
+                    ]
+        
+        self.graph.remove_nodes_from([f'new_node_{num}' for num in range(num_X)])
+        return predictions
