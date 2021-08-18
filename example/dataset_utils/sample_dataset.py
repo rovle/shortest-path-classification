@@ -1,4 +1,4 @@
-from languages_dict import LANGUAGES
+from example.dataset_utils.languages_dict import LANGUAGES
 import numpy as np
 import random
 import os
@@ -11,7 +11,7 @@ def sample_dataset(n, length, language, random_state=None):
         random.seed(random_state)
     path_to_text = os.path.join(path, language + '_text.txt')
 
-    with open(path_to_text, 'r') as file:
+    with open(path_to_text, 'r', encoding='utf-8') as file:
         text = file.read()
 
     text = text.split()
