@@ -34,8 +34,8 @@ class ShortestPathModel():
         n_samples = len(X)
         self.predictions_on_train_set = \
                     [            
-                    1 if self.distances(str(x)) < self.decision_boundary
-                    else 0 for x in range(n_samples - 1)
+                    1 if (self.distances[str(x)] < self.decision_boundary)
+                    else 0 for x in range(n_samples)
                     ]
         
         return self
