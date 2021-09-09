@@ -11,8 +11,22 @@ class ShortestPathModel():
     def __init__(self, weight_fn, ):
         self.weight_fn = weight_fn
         self.has_been_fit = False
+        
+    def prepare_data(self, anchor_class, other_class):
+        self.current_sample = anchor_class + other_class
+        self.labels = ( len(anchor_class) * [1] +
+                len(other_class) * [0] )
+        self.n_of_labels = len(self.labels)
+        self.data_prepared = True
+        
 
-    def fit(self, X):        
+    def fit(self, X=None):
+        if not self.data_prepared and not X:
+            raise ReferenceError("You have to supply data either through prepare_data function or directly passing it to fit!")
+        if self.data_prepared and X:
+            raise ReferenceError("You've already prepared data, please call fit without any new data.")
+        if self.data_prepared:
+            X = self.current_sample
         X_enumerated = list(enumerate(X))
 
         nodes = namedtuple('node', 'index features')
@@ -28,19 +42,28 @@ class ShortestPathModel():
         
         self.distances = single_source_dijkstra(self.graph, '0')[0]
         self.decision_boundary = median(self.distances.values())
-
         self.has_been_fit = True
+
         return self
         
-    def fit_predict(self, X):
+    def fit_predict(self, X=None):
         self.fit(X)
-        n_samples = len(X)
-        self.predictions_on_train_set = \
+        if self.data_prepared:
+            n_samples = self.n_of_labels
+        else:
+            n_samples = len(X)
+        self.predictions = \
                     [            
                     1 if (self.distances[str(x)] < self.decision_boundary)
                     else 0 for x in range(n_samples)
                     ]
         
+        if self.data_prepared:
+            n_of_hits = sum([1 if (self.labels[i] == self.predictions[i])
+                                else 0
+                                for i in range(len(self.labels))][1:])
+            self.accuracy_ = n_of_hits / (len(self.labels) - 1)
+
         return self
 
     def predict(self, X, keep_new_nodes=False):
@@ -51,7 +74,7 @@ class ShortestPathModel():
             weight = self.weight_fn(X[new_node_num], old_node)
             if weight is not float('inf'):
                 self.graph.add_edge(f"new_node_ {new_node_num}",
-                                    old_node, weight)                                    )
+                                    old_node, weight)
         distances_new = single_source_dijkstra(self.graph,
                                                 '0')[0][len(self.graph.nodes):]
 
