@@ -13,6 +13,7 @@ class ShortestPathModel():
         self.has_been_fit = False
         
     def prepare_data(self, anchor_class, other_class):
+        anchor_class, other_class = list(anchor_class), list(other_class) 
         self.current_sample = anchor_class + other_class
         self.labels = ( len(anchor_class) * [1] +
                 len(other_class) * [0] )
