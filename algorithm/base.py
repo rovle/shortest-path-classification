@@ -9,19 +9,57 @@ from statistics import median
 
 class ShortestPathModel():
     def __init__(self, weight_fn, ):
+        """
+        Class for the Shortest Path model.
+
+            Parameters
+            ----------
+            weight_fn : function which takes two arguments and returns
+                        a nonnegative number
+
+
+        """
         self.weight_fn = weight_fn
         self.has_been_fit = False
         
     def prepare_data(self, anchor_class, other_class):
+        """
+        Function to prepare the data in the case where you already have
+        the anchor and other class separated. Therefore, this function is
+        primarily meant for testing stuff on the datasets where you already
+        know the answer.
+
+            Parameters
+            ----------
+            anchor_class : list or array-like of shape (n_sample, n_features)
+                The list-like of "positive" examples, of which the first element
+                is going to be used as the anchor vertex in the algorithm.
+            
+            other_class : list or array-like of shape (n_sample, n_features)
+                The list-like of "negative" examples.
+        """
         anchor_class, other_class = list(anchor_class), list(other_class) 
         self.current_sample = anchor_class + other_class
         self.labels = ( len(anchor_class) * [1] +
-                len(other_class) * [0] )
+                        len(other_class) * [0] )
         self.n_of_labels = len(self.labels)
         self.data_prepared = True
-        
 
     def fit(self, X=None):
+        """
+        Function to fit the model to the data.
+
+            Parameters
+            ----------
+            X : list or array-like of shape (n_sample, n_features), default=None
+                If None, then check whether the prepare_data functions has been called.
+                If not, then it should be a list or an array-like which contains the data
+                to be fit on.
+             
+            Returns
+            -------
+            self            
+        """
         if not self.data_prepared and not X:
             raise ReferenceError("You have to supply data either through prepare_data function or directly passing it to fit!")
         if self.data_prepared and X:
@@ -48,6 +86,19 @@ class ShortestPathModel():
         return self
         
     def fit_predict(self, X=None):
+        """
+        Function which first fits on the data (by calling .fit()) and
+        then computes the predictions and the accuracy (if labels are known
+        because the prepare_data function has been called) on the initial dataset.
+
+            Parameters
+            ----------
+            X : list or array-like of shape (n_sample, n_features), default=None
+                If None, then check whether the prepare_data functions has been called.
+                If not, then it should be a list or an array-like which contains the data
+                to be fit on.
+
+        """
         self.fit(X)
         if self.data_prepared:
             n_samples = self.n_of_labels
@@ -68,6 +119,13 @@ class ShortestPathModel():
         return self
 
     def predict(self, X, keep_new_nodes=False):
+        """
+        Function to predict the labels once the model has already been fit.
+
+            Parameters
+            ----------
+            
+        """
         if not self.has_been_fit:
             raise ReferenceError("The model has not been fitted yet.")
         num_X = len(X)
