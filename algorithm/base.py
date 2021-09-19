@@ -32,11 +32,11 @@ class ShortestPathModel():
             Parameters
             ----------
             anchor_class : list or array-like of shape (n_sample, n_features)
-                The list-like of "positive" examples, of which the first element
+                The list-like of "positive" demos, of which the first element
                 is going to be used as the anchor vertex in the algorithm.
             
             other_class : list or array-like of shape (n_sample, n_features)
-                The list-like of "negative" examples.
+                The list-like of "negative" demos.
         """
         anchor_class, other_class = list(anchor_class), list(other_class) 
         self.current_sample = anchor_class + other_class
