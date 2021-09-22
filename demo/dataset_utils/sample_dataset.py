@@ -9,7 +9,7 @@ LEN_OF_SAMPLES = 10
 def sample_dataset(n, length, language, random_state=None):
     if random_state is not None:
         random.seed(random_state)
-    path_to_text = os.path.join(path, language + '_text.txt')
+    path_to_text = os.path.join(path, f'{language}_text.txt')
 
     with open(path_to_text, 'r', encoding='utf-8') as file:
         text = file.read().split()

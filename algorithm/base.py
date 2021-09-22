@@ -8,7 +8,7 @@ from statistics import median
 
 
 class ShortestPathModel():
-    def __init__(self, weight_fn, ):
+    def __init__(self, weight_fn):
         """
         Class for the Shortest Path model.
 
@@ -87,9 +87,10 @@ class ShortestPathModel():
         
     def fit_predict(self, X=None):
         """
-        Function which first fits on the data (by calling .fit()) and
-        then computes the predictions and the accuracy (if labels are known
-        because the prepare_data function has been called) on the initial dataset.
+        Function which first fits on the data (by calling .fit())
+        and then computes the predictions and the accuracy (if
+        labels are known because the prepare_data function has 
+        been called) on the initial dataset.
 
             Parameters
             ----------
