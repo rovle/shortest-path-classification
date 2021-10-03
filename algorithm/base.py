@@ -8,19 +8,57 @@ from statistics import median
 
 
 class ShortestPathModel():
+    """Implements the Shortest Path model.
+
+    This class is an implemention of the shortest path model, enabling
+    one to prepare data for it, fit it, and use it for prediction.
+
+    You can read more about the model at <link>.
+
+    Parameters
+    ----------
+    weight_fn : function
+        Function which takes two arguments and returns
+        a nonnegative number; serves as a function which
+        computes the weights in our graph.
+            
+    Attributes
+    ----------
+    is_fit : bool
+        Flag for whether the model has been fit already or not.
+    
+    current_sample : list
+        In case the prepare_data function is used, this holds all
+        the samples in the current dataset.
+
+    labels : list
+        In case the prepare_data function is used, this holds all
+        the labels of the current dataset.
+
+    n_of_labels : int
+        In case the prepare_data function is used, this is the size
+        of our dataset.
+
+    is_data_prepared : bool
+        Flag for whether the prepare_data function was called.
+
+    graph : NetworkX Graph object
+
+    distances : list
+
+    decision_boundary : float
+
+    accuracy_ : float in [0,1]
+
+    Examples
+    --------
+
+
+    """
+
     def __init__(self, weight_fn):
-        """
-        Class for the Shortest Path model.
-
-            Parameters
-            ----------
-            weight_fn : function which takes two arguments and returns
-                        a nonnegative number
-
-
-        """
         self.weight_fn = weight_fn
-        self.has_been_fit = False
+        self.is_fit = False
         
     def prepare_data(self, anchor_class, other_class):
         """
@@ -43,7 +81,26 @@ class ShortestPathModel():
         self.labels = ( len(anchor_class) * [1] +
                         len(other_class) * [0] )
         self.n_of_labels = len(self.labels)
-        self.data_prepared = True
+        self.is_data_prepared = True
+        return self
+
+    def resolve_data(self, X, preparedness_flag):
+        """
+        A helper function handling the case of data being prepared
+        by the prepare_data function.
+        """
+        if not self.is_data_prepared and not X:
+            raise ReferenceError("You have to supply data either through"
+                                "through the prepare_data function or"
+                                "directly passing it to fit!")
+        if self.is_data_prepared and X:
+            raise ReferenceError("You've already prepared data,"
+                                "please call fit without any new data.")
+        if self.is_data_prepared:
+            return self.current_sample
+        else:
+            return X
+
 
     def fit(self, X=None):
         """
@@ -52,19 +109,20 @@ class ShortestPathModel():
             Parameters
             ----------
             X : list or array-like of shape (n_sample, n_features), default=None
-                If None, then check whether the prepare_data functions has been called.
-                If not, then it should be a list or an array-like which contains the data
-                to be fit on.
+                If None, then check whether the prepare_data functions has been
+                called. If not, then it should be a list or an array-like which
+                contains the data to be fit on.
              
             Returns
             -------
-            self            
+            self : object
+            Returns an instance of self.         
         """
-        if not self.data_prepared and not X:
+        if not self.is_data_prepared and not X:
             raise ReferenceError("You have to supply data either through prepare_data function or directly passing it to fit!")
-        if self.data_prepared and X:
+        if self.is_data_prepared and X:
             raise ReferenceError("You've already prepared data, please call fit without any new data.")
-        if self.data_prepared:
+        if self.is_data_prepared:
             X = self.current_sample
         X_enumerated = list(enumerate(X))
 
@@ -81,7 +139,7 @@ class ShortestPathModel():
         
         self.distances = single_source_dijkstra(self.graph, '0')[0]
         self.decision_boundary = median(self.distances.values())
-        self.has_been_fit = True
+        self.is_fit = True
 
         return self
         
@@ -101,17 +159,19 @@ class ShortestPathModel():
 
         """
         self.fit(X)
-        if self.data_prepared:
+
+        if self.is_data_prepared:
             n_samples = self.n_of_labels
         else:
             n_samples = len(X)
+
         self.predictions = \
                     [            
                     1 if (self.distances[str(x)] < self.decision_boundary)
                     else 0 for x in range(n_samples)
                     ]
         
-        if self.data_prepared:
+        if self.is_data_prepared:
             n_of_hits = sum([1 if (self.labels[i] == self.predictions[i])
                                 else 0
                                 for i in range(len(self.labels))][1:])
@@ -127,8 +187,11 @@ class ShortestPathModel():
             ----------
             
         """
-        if not self.has_been_fit:
+        try:
+            self.graph
+        except NameError:
             raise ReferenceError("The model has not been fitted yet.")
+
         num_X = len(X)
         for new_node_num, old_node in product(range(num_X), self.graph.nodes):
             weight = self.weight_fn(X[new_node_num], old_node)
