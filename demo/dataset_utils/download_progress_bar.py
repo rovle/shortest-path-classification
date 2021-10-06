@@ -1,9 +1,8 @@
 """
 Just a script to diplay a download progress bar
 for the dataset. Taken from:
-    [stackoverflow link...]
+    https://stackoverflow.com/a/46825841
 """
-
 
 import progressbar
 

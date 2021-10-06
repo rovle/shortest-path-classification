@@ -109,9 +109,6 @@ class ShortestPathModel():
         X : list or array-like of shape (n_sample, n_features), default=None
             Either None or a container of the dataset.
 
-        preparedness_flag: boolean
-            Flag for whether the prepare_data function has been called.
-
         Returns
         -------
         X : list or array-like of shape (n_sample, n_features)
@@ -164,16 +161,13 @@ class ShortestPathModel():
         for x_1, x_2 in combinations(X_enumerated, 2):
             weight = self.weight_fn(x_1.features,
                                             x_2.features)
-            if weight is not float('inf'):
+            if weight is not float('inf'): #maybe remove this
                 self.graph.add_edge(str(x_1.index), str(x_2.index),
                                 weight=weight)
 
         if nx.is_empty(self.graph):
             raise Exception("The graph is empty. Please check whether your"
                             " weight function is well configured.")
-        if not nx.is_connected(self.graph):
-            raise Exception("The graph needs to be connected. Please use a"
-                            " weight function which connects more vertices.")
         
         self.distances = single_source_dijkstra(self.graph, '0')[0]
         self.decision_boundary = median(self.distances.values())

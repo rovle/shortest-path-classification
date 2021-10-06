@@ -1,3 +1,13 @@
+"""
+This script takes the XML-formatted ('unformatted')
+European Parliamentary Proceedings files and converts
+them into big chunks of text ('formatted') which are
+more suitable to my needs.
+
+It uses BeautifulSoup to parse the XML files, and collects a 
+roughly 25 million character-long text file of each of these languages.
+"""
+
 from bs4 import BeautifulSoup
 from pathlib import Path
 
