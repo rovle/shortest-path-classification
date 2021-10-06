@@ -1,2 +1,5 @@
 .vscode/settings.json
 demo/dataset
+__pycache__/
+*.py[cod]
+demo/digits

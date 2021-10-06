@@ -43,13 +43,20 @@ class ShortestPathModel():
         Flag for whether the prepare_data function was called.
 
     graph : NetworkX Graph object
+        The graph object containing all the information about the
+        relations in the dataset.
 
     distances : list
+        List of distances of shortest paths from the anchor element
+        to every vertex of the graph / point in the dataset.
 
     decision_boundary : float
-
+        Median of the distances; points are classified as belonging
+        to the anchor class if below the decision_boundary, otherwise
+        to the other class.
     accuracy_ : float in [0,1]
-
+        If prepare_data was called, automatically compute and save
+        the 
     Examples
     --------
 
@@ -58,7 +65,7 @@ class ShortestPathModel():
 
     def __init__(self, weight_fn):
         self.weight_fn = weight_fn
-        self.is_fit = False
+        self.is_data_prepared = False
         
     def prepare_data(self, anchor_class, other_class):
         """
@@ -67,14 +74,19 @@ class ShortestPathModel():
         primarily meant for testing stuff on the datasets where you already
         know the answer.
 
-            Parameters
-            ----------
-            anchor_class : list or array-like of shape (n_sample, n_features)
-                The list-like of "positive" demos, of which the first element
-                is going to be used as the anchor vertex in the algorithm.
-            
-            other_class : list or array-like of shape (n_sample, n_features)
-                The list-like of "negative" demos.
+        Parameters
+        ----------
+        anchor_class : list or array-like of shape (n_sample, n_features)
+            The list-like of "positive" demos, of which the first element
+            is going to be used as the anchor vertex in the algorithm.
+        
+        other_class : list or array-like of shape (n_sample, n_features)
+            The list-like of "negative" demos.
+
+        Returns
+        -------
+        self : object
+            Returns an instance of self.
         """
         anchor_class, other_class = list(anchor_class), list(other_class) 
         self.current_sample = anchor_class + other_class
@@ -84,19 +96,37 @@ class ShortestPathModel():
         self.is_data_prepared = True
         return self
 
-    def resolve_data(self, X, preparedness_flag):
+    def resolve_data(self, X):
         """
         A helper function handling the case of data being prepared
-        by the prepare_data function.
+        by the prepare_data function. It serves as a preprocesing of
+        the input to the fit procedure -- since fit allows None in the
+        case that data was previously prepared, one has to check for the
+        status of these various ways of inputting the data.
+
+        Parameters
+        ----------
+        X : list or array-like of shape (n_sample, n_features), default=None
+            Either None or a container of the dataset.
+
+        preparedness_flag: boolean
+            Flag for whether the prepare_data function has been called.
+
+        Returns
+        -------
+        X : list or array-like of shape (n_sample, n_features)
+            X, unaltered if prepare_data has not been called.
+        self.current_sample : list
+            The data prepared by the prepare_data function.
         """
-        if not self.is_data_prepared and not X:
+        if not self.is_data_prepared and X is None:
             raise ReferenceError("You have to supply data either through"
                                 "through the prepare_data function or"
                                 "directly passing it to fit!")
-        if self.is_data_prepared and X:
+        elif self.is_data_prepared and X is not None:
             raise ReferenceError("You've already prepared data,"
                                 "please call fit without any new data.")
-        if self.is_data_prepared:
+        elif self.is_data_prepared:
             return self.current_sample
         else:
             return X
@@ -106,24 +136,25 @@ class ShortestPathModel():
         """
         Function to fit the model to the data.
 
-            Parameters
-            ----------
-            X : list or array-like of shape (n_sample, n_features), default=None
-                If None, then check whether the prepare_data functions has been
-                called. If not, then it should be a list or an array-like which
-                contains the data to be fit on.
-             
-            Returns
-            -------
-            self : object
-            Returns an instance of self.         
+        The functions first uses the weight function to build a NetworkX
+        graph, whereupon (if the graph is connected and not not empty)
+        distances from the anchor element are computed, via the Dijkstra
+        algorithm. That is used to compute the decision boundary.
+
+        Parameters
+        ----------
+        X : list or array-like of shape (n_sample, n_features), default=None
+            If None, then check whether the prepare_data functions has been
+            called. If not, then it should be a list or an array-like which
+            contains the data to be fit on.
+            
+        Returns
+        -------
+        self : object
+        Returns an instance of self.         
         """
-        if not self.is_data_prepared and not X:
-            raise ReferenceError("You have to supply data either through prepare_data function or directly passing it to fit!")
-        if self.is_data_prepared and X:
-            raise ReferenceError("You've already prepared data, please call fit without any new data.")
-        if self.is_data_prepared:
-            X = self.current_sample
+        X = self.resolve_data(X)
+
         X_enumerated = list(enumerate(X))
 
         nodes = namedtuple('node', 'index features')
@@ -136,10 +167,16 @@ class ShortestPathModel():
             if weight is not float('inf'):
                 self.graph.add_edge(str(x_1.index), str(x_2.index),
                                 weight=weight)
+
+        if nx.is_empty(self.graph):
+            raise Exception("The graph is empty. Please check whether your"
+                            " weight function is well configured.")
+        if not nx.is_connected(self.graph):
+            raise Exception("The graph needs to be connected. Please use a"
+                            " weight function which connects more vertices.")
         
         self.distances = single_source_dijkstra(self.graph, '0')[0]
         self.decision_boundary = median(self.distances.values())
-        self.is_fit = True
 
         return self
         
@@ -150,13 +187,17 @@ class ShortestPathModel():
         labels are known because the prepare_data function has 
         been called) on the initial dataset.
 
-            Parameters
-            ----------
-            X : list or array-like of shape (n_sample, n_features), default=None
-                If None, then check whether the prepare_data functions has been called.
-                If not, then it should be a list or an array-like which contains the data
-                to be fit on.
+        Parameters
+        ----------
+        X : list or array-like of shape (n_sample, n_features), default=None
+            If None, then check whether the prepare_data functions has
+            been called. If not, then it should be a list or an array-like
+            which contains the data to be fit on.
 
+        Returns
+        -------
+        self : objects
+        Returns an instance of self.
         """
         self.fit(X)
 
@@ -181,11 +222,25 @@ class ShortestPathModel():
 
     def predict(self, X, keep_new_nodes=False):
         """
-        Function to predict the labels once the model has already been fit.
+        Function that predicts classes of a new dataset given to it.
 
-            Parameters
-            ----------
-            
+        In particular, depending on whether the keep_new_nodes if True or
+        False it might incorporate that new dataset into its graph, or it
+        might not.
+
+        Parameters
+        ----------
+        X : list or array-like of shape (n_sample, n_features), default=None
+            A container for example to be classified.
+        
+        keep_new_nodes : boolean
+            If True, leave the X in the model's graph, otherwise remove
+            them.
+
+        Returns
+        -------
+        self : objects
+        Returns an instance of self.
         """
         try:
             self.graph
@@ -208,6 +263,7 @@ class ShortestPathModel():
                     ]
         
         if not keep_new_nodes:
-            self.graph.remove_nodes_from([f'new_node_{num}' for num in range(num_X)])
+            self.graph.remove_nodes_from([f'new_node_{num}'
+                                            for num in range(num_X)])
 
         return predictions
