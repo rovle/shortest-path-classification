@@ -1,6 +1,6 @@
 import unittest
 
-from shpaclass.model import ShortestPathModel
+from shapaclass.model import ShortestPathModel
 
 class PreparationTest(unittest.TestCase):
     """Test the prepare_data function."""

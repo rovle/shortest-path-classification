@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-  name='shpaclass',
-  packages = ['shpaclass'],
+  name='shapaclass',
+  packages = ['shapaclass'],
   version='0.1.2',
   author='Lovre',
   author_email='lovre.pesut@gmail.com',
