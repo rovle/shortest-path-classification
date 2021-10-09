@@ -6,7 +6,7 @@ Suppose you have a dataset in which you know label of at least one – but not m
 
 Suppose your data is composed of (feature) vectors in <img src="https://latex.codecogs.com/png.latex?\mathbb{R}^d" />  if you're not assuming anything about your data, and you're supposing the dataset is balanced, you might opt for the following classification rule: supposing you call known example's feature vector v, then compute the Euclidean distance of each element in the dataset and the vector v; the closer half is classified as the class of v, the farther half is classified as the other class.
 
-That is not the case that is particularly interesting to solve, but consider now a similar problem: a dataset to which you have a reasonable metric in mind, but most elements are incomparable. (You might think of a metric whose values are in <img src="https://latex.codecogs.com/png.latex?[0, +\infty]" />.) What is, then, the intuitive counterpart of the above algorithm?
+That is not the case that is particularly interesting to solve, but consider now a similar problem: a dataset to which you have a reasonable metric in mind, but most elements are incomparable. (You can think of a metric whose domain has been extended with positive infinity.) What is, then, the intuitive counterpart of the above algorithm?
 
 The answer that this repo proposes is to turn the dataset into a graph where each data point is a node, and the edges between them either have a finite positive weight if two data points are comparable; otherwise infinite weight (which is basically equivalent to them not being connected, but it is slighlty more convenient to put infinite weight to avoid cumbersome situations when the graph ends up unconnected). Then, find the shortest path from our known example to each of other data point; classify the closer half (in terms of the weight of the shortest path) to the known example's class, the farther half to the other class.
 
@@ -24,7 +24,7 @@ In order to run the demo/languages.ipynb notebook yourself, you have to first ca
 
 ## Installing
 
--Just run
+Just run
 
 ```
 pip install shapaclass
