@@ -57,6 +57,7 @@ class ShortestPathModel():
     accuracy_ : float in [0,1]
         If prepare_data was called, automatically compute and save
         the 
+
     Examples
     --------
 
@@ -160,10 +161,9 @@ class ShortestPathModel():
         self.graph = nx.Graph()
         for x_1, x_2 in combinations(X_enumerated, 2):
             weight = self.weight_fn(x_1.features,
-                                            x_2.features)
-            if weight is not float('inf'): #maybe remove this
-                self.graph.add_edge(str(x_1.index), str(x_2.index),
-                                weight=weight)
+                                    x_2.features)
+            self.graph.add_edge(str(x_1.index), str(x_2.index),
+                            weight=weight)
 
         if nx.is_empty(self.graph):
             raise Exception("The graph is empty. Please check whether your"
