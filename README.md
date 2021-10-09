@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Suppose you have a dataset in which you know label of at least one – but not many more – label. Given this one labelled example, you want to classify all the other points in the dataset as either belonging to the class of that element, or the other class.
+Suppose you have a dataset in which you know that data points belong to one of two classes, but you don't know the label of many – maybe just of one. Given this one labelled example, you want to classify all other points in the dataset as either belonging to the class of that element, or the other class.
 
 If your data is composed of (feature) vectors in <img src="https://latex.codecogs.com/png.latex?\mathbb{R}^d" /> and if you're not assuming anything about your data, and you're supposing the dataset is balanced, you might opt for the following classification rule: supposing you call known example's feature vector v, then compute the Euclidean distance of each element in the dataset and the vector v; the closer half is classified as the class of v, the farther half is classified as the other class.
 
