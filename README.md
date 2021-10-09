@@ -4,7 +4,7 @@
 
 Suppose you have a dataset in which you know label of at least one – but not many more – label. Given this one labelled example, you want to classify all the other points in the dataset as either belonging to the class of that element, or the other class.
 
-Suppose your data is composed of (feature) vectors in <img src="https://latex.codecogs.com/png.latex?\mathbb{R}^d" />  if you're not assuming anything about your data, and you're supposing the dataset is balanced, you might opt for the following classification rule: supposing you call known example's feature vector v, then compute the Euclidean distance of each element in the dataset and the vector v; the closer half is classified as the class of v, the farther half is classified as the other class.
+If your data is composed of (feature) vectors in <img src="https://latex.codecogs.com/png.latex?\mathbb{R}^d" /> and if you're not assuming anything about your data, and you're supposing the dataset is balanced, you might opt for the following classification rule: supposing you call known example's feature vector v, then compute the Euclidean distance of each element in the dataset and the vector v; the closer half is classified as the class of v, the farther half is classified as the other class.
 
 That is not the case that is particularly interesting to solve, but consider now a similar problem: a dataset to which you have a reasonable metric in mind, but most elements are incomparable. (You can think of a metric whose domain has been extended with positive infinity.) What is, then, the intuitive counterpart of the above algorithm?
 
