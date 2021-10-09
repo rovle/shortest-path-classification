@@ -55,20 +55,3 @@ class TestAccuracy(unittest.TestCase):
         model.fit_predict()
 
         self.assertEqual(model.accuracy_, 0.8)
-
-class TestGraphConnectedness(unittest.TestCase):
-    """Test whether the module handles the graph connectedness correctly."""
-    def test_connected(self):
-        def weights(x,y): return 0
-        x = [1 for _ in range(100)]
-        y = [0 for _ in range(100)]
-        model = ShortestPathModel(weights)
-        model.fit_predict(x+y)
-
-    def test_unconnected(self):
-        def weights(x,y): return float('inf')
-        x = [1 for _ in range(100)]
-        y = [0 for _ in range(100)]
-        model = ShortestPathModel(weights)
-        with self.assertRaises(Exception):
-            model.fit_predict(x+y)

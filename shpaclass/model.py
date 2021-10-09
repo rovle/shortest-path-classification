@@ -54,14 +54,10 @@ class ShortestPathModel():
         Median of the distances; points are classified as belonging
         to the anchor class if below the decision_boundary, otherwise
         to the other class.
+        
     accuracy_ : float in [0,1]
         If prepare_data was called, automatically compute and save
         the 
-
-    Examples
-    --------
-
-
     """
 
     def __init__(self, weight_fn):

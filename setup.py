@@ -7,11 +7,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
   name='shpaclass',
   packages = ['shpaclass'],
-  version='0.1.0',
+  version='0.1.2',
   author='Lovre',
   author_email='lovre.pesut@gmail.com',
   description='Classification algorithm based on finding shortest paths',
   long_description=long_description,
+  long_description_content_type='text/markdown',
   url='https://github.com/rovle/shortest-path-classification',
   keywords=['machine learning', 'graphs'],
   license='MIT',
