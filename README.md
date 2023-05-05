@@ -3,7 +3,7 @@
 Suppose you want to classify a set of messages written in two languages, but you have no labeled examples, only a bunch of messages from both of those language. You could take one message, see which language it is, and then classifty those messages "similar" to it as that language, and those "dissimilar" as the other.
 But defining similarity for general pairs of strings in languages might be a bit of a daunting task. One can, e.g., define a similarity as a function of how many words two strings share, but then many string become incomparable.
 
-That's where this algorithm comes in play. Given a dataset $\mathcal{D}$ and a metric $\mathrm{d} : \mathcal{D} \to [0, +\infty]$ (note that this metric can [assume infinity](https://math.stackexchange.com/a/399759)), one forms a graph between points, with an edge between points $x_1$ and $x_2$ existing iff $\mathrm{d}(x_1, x_2)$ is finite. Then one takes one example which one can classify, and finds shortest weighted path between it and all other points in the dataset; classifying them with respect to weight of the path between the known example and them.
+That's where this algorithm comes in play. Given a dataset $\mathcal{D}$ and a metric $\mathrm{d} : \mathcal{D} \to [0, +\infty]$ (note that this metric can [assume infinity](https://math.stackexchange.com/a/399759)), one forms a graph between points, with an edge between points $x_1$ and $x_2$ existing iff $\mathrm{d}(x_1, x_2)$ is finite. Then one takes one example which they can classify, and finds shortest weighted path between it and all other points in the dataset; classifying them with respect to weight of the path between the known example and them.
 
 ### Demo
 
